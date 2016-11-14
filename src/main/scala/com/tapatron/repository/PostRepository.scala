@@ -8,8 +8,8 @@ import scalikejdbc._
 
 @Singleton
 class PostRepository {
-  def selectAll(limit: Int): Seq[Post] = DB readOnly { implicit session =>
-    sql"SELECT * FROM posts ORDER BY added DESC LIMIT ${limit}".map { rs => Post(rs) }.list.apply()
+  def selectAll(limit: Int, offset: Int): Seq[Post] = DB readOnly { implicit session =>
+    sql"SELECT * FROM posts ORDER BY added DESC LIMIT ${limit} OFFSET ${offset}".map { rs => Post(rs) }.list.apply()
   }
 
   def selectById(id: UUID): Option[Post] = DB readOnly { implicit session =>
