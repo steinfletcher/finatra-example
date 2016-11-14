@@ -7,11 +7,14 @@ import com.tapatron.data.Post
 import com.tapatron.repository.{CategoryRepository, PostRepository}
 
 @Singleton
-class PostService @Inject()(postRepository: PostRepository, categoryRepository: CategoryRepository) {
+class PostService @Inject() (postRepository: PostRepository, categoryRepository: CategoryRepository) {
 
-  def findAll(limit: Int, page: Int): Seq[Post] = {
+  def findAll(limit: Int, page: Int, categories: Option[Seq[String]]): Seq[Post] = {
     val offset = limit * page
-    postRepository.selectAll(limit, offset)
+    categories match {
+      case Some(cat) => postRepository.selectAll(limit, offset, cat)
+      case None => postRepository.selectAll(limit, offset)
+    }
   }
 
   def findById(id: UUID): Option[Post] = {

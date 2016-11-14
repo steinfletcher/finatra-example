@@ -19,6 +19,7 @@ CREATE TABLE posts (
 );
 
 CREATE TABLE post_categories (
+  id UUID PRIMARY KEY,
   posts_id UUID NOT NULL REFERENCES posts (id),
   text     TEXT NOT NULL
 );

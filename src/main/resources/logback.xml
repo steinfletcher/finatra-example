@@ -13,10 +13,6 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="slick.jdbc" level="ERROR" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
     <logger name="com.zaxxer.hikari" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
@@ -25,11 +21,11 @@
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="com.twitter.finatra.http.routing.HttpRouter" level="ERROR" additivity="false">
+    <logger name="com.twitter.finatra.http.routing.HttpRouter" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="ERROR">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 
