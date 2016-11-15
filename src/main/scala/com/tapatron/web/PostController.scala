@@ -1,7 +1,5 @@
 package com.tapatron.web
 
-import java.util.UUID
-
 import com.google.inject.Inject
 import com.tapatron.service.PostService
 import com.twitter.finatra.http.Controller
@@ -22,4 +20,4 @@ case class FindAllPostsRequest(@Max(50) @QueryParam limit: Int = 10,
                                @Min(0) @QueryParam page: Int = 0,
                                @QueryParam q: Option[String] = None)
 
-case class FindPostRequest(@RouteParam id: UUID)
+case class FindPostRequest(@RouteParam id: Long)

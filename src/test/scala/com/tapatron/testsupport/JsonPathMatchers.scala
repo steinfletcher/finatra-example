@@ -17,6 +17,10 @@ trait JsonPathMatchers {
 
   def int(i: Int) = i
 
+  def long(i: Long) = i
+
+  def id(i: Option[Long]) = i.get
+
   def double(f: Double) = f
 
   def text(s: String) = s

@@ -7,8 +7,8 @@ import com.tapatron.data.Post
 
 object Fixtures {
 
-  def aPost(): Post = Post(
-    id = UUID.randomUUID(),
+  def aPost(id: Option[Long]): Post = Post(
+    id = id,
     articleId = UUID.randomUUID().toString,
     title = "Some post",
     source = "reddit",

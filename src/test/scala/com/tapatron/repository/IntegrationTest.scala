@@ -9,8 +9,15 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTest
 import scalikejdbc._
 
+import scala.math.Numeric.IntIsIntegral.abs
+import scala.util.Random
+
 class IntegrationTest extends FeatureTest with JsonPathMatchers {
   override val server = new EmbeddedHttpServer(new DyServer)
+
+  val random = new Random()
+
+  def generateId() = Some(abs(random.nextInt()).toLong)
 
   def clearData() = DB localTx  { implicit session =>
     sql"DELETE FROM post_categories".update.apply()
@@ -26,7 +33,7 @@ class IntegrationTest extends FeatureTest with JsonPathMatchers {
 
       post.categories match {
         case Some(categories) => categories.foreach(category => {
-          sql"INSERT INTO post_categories VALUES (${randomUUID()}, ${post.id}, ${category})".update.apply()
+          sql"INSERT INTO post_categories(id, posts_id, text) VALUES (${generateId()}, ${post.id}, ${category})".update.apply()
         })
         case _ => ;
       }

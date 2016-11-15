@@ -1,7 +1,6 @@
 package com.tapatron.repository
 
 import java.time.LocalDateTime.now
-import java.util.UUID.randomUUID
 
 import com.tapatron.Fixtures.aPost
 import com.tapatron.data.Post
@@ -15,7 +14,7 @@ class PostTest extends IntegrationTest {
 
   "PostResource#fetchPost" should {
     "return a specific post" in {
-      val postId = randomUUID()
+      val postId = generateId()
 
       givenSomePosts(
         Post(
@@ -30,66 +29,66 @@ class PostTest extends IntegrationTest {
         )
       )
 
-      val response = server.httpGet(path = s"/post/${postId}",
+      val response = server.httpGet(path = s"/post/${postId.get}",
         andExpect = Status.Ok).getContentString()
 
       jsonPath("$.source", response) should containItems(text("reddit"))
       jsonPath("$.title", response) should containItems(text("Some post"))
       jsonPath("$.article_id", response) should containItems(text("8rwDR5235qwg"))
-      jsonPath("$.id", response) should containItems(text(postId.toString))
+      jsonPath("$.id", response) should containItems(id(postId))
       jsonPath("$.url", response) should containItems(text("http://url"))
       jsonPath("$.img_url", response) should containItems(text("http://imgUrl"))
     }
 
     "return NotFound if post id does not exist" in {
-      server.httpGet(path = s"/post/${randomUUID()}", andExpect = Status.NotFound)
+      server.httpGet(path = s"/post/61616161", andExpect = Status.NotFound)
     }
 
     "return BadRequest if post id invalid" in {
-      val response = server.httpGet(path = s"/post/1234", andExpect = Status.BadRequest)
+      val response = server.httpGet(path = s"/post/wrongtype", andExpect = Status.BadRequest)
         .getContentString()
 
-      jsonPath("$.errors[*]", response) should containItems(text("id: '1234' is not a valid UUID"))
+      jsonPath("$.errors[*]", response) should containItems(text("id: 'wrongtype' is not a valid Long"))
     }
   }
 
   "PostResource#fetchPosts" should {
     "return the most recent posts" in {
-      val post1Id = randomUUID()
-      val post2Id = randomUUID()
-      val post3Id = randomUUID()
+      val post1Id = generateId()
+      val post2Id = generateId()
+      val post3Id = generateId()
 
       givenSomePosts(
-        aPost().copy(id = post1Id, added = now().minusHours(10)),
-        aPost().copy(id = post2Id, added = now().minusHours(5)),
-        aPost().copy(id = post3Id, added = now().minusHours(1))
+        aPost(post1Id).copy(added = now().minusHours(10)),
+        aPost(post2Id).copy(added = now().minusHours(5)),
+        aPost(post3Id).copy(added = now().minusHours(1))
       )
 
       val response = server.httpGet(path = "/post?limit=2", andExpect = Status.Ok).getContentString()
 
-      jsonPath("$[*].id", response) should containItems(text(post3Id.toString), text(post2Id.toString))
+      jsonPath("$[*].id", response) should containItems(id(post3Id), id(post2Id))
     }
   }
 
   "PostResource#fetchPosts" should {
     "support paging" in {
-      val post1Id = randomUUID()
-      val post2Id = randomUUID()
-      val post3Id = randomUUID()
-      val post4Id = randomUUID()
+      val post1Id = generateId()
+      val post2Id = generateId()
+      val post3Id = generateId()
+      val post4Id = generateId()
 
       givenSomePosts(
-        aPost().copy(id = post1Id, title = "post1", added = now().minusMinutes(10)),
-        aPost().copy(id = post2Id, title = "post2", added = now().minusMinutes(8)),
-        aPost().copy(id = post3Id, title = "post3", added = now().minusMinutes(6)),
-        aPost().copy(id = post4Id, title = "post4", added = now().minusMinutes(4))
+        aPost(post1Id).copy(title = "post1", added = now().minusMinutes(10)),
+        aPost(post2Id).copy(title = "post2", added = now().minusMinutes(8)),
+        aPost(post3Id).copy(title = "post3", added = now().minusMinutes(6)),
+        aPost(post4Id).copy(title = "post4", added = now().minusMinutes(4))
       )
 
       val page1 = server.httpGet(path = "/post?limit=2&page=0", andExpect = Status.Ok).getContentString()
-      jsonPath("$[*].id", page1) should containItems(text(post4Id.toString), text(post3Id.toString))
+      jsonPath("$[*].id", page1) should containItems(id(post4Id), id(post3Id))
 
       val page2 = server.httpGet(path = "/post?limit=2&page=1", andExpect = Status.Ok).getContentString()
-      jsonPath("$[*].id", page2) should containItems(text(post2Id.toString), text(post1Id.toString))
+      jsonPath("$[*].id", page2) should containItems(id(post2Id), id(post1Id))
     }
   }
 
@@ -97,10 +96,10 @@ class PostTest extends IntegrationTest {
     "support category search" in {
 
       givenSomePosts(
-        aPost().copy(title = "food and tech", categories = Some(Seq("FOOD", "TECH"))),
-        aPost().copy(title = "food", categories = Some(Seq("FOOD"))),
-        aPost().copy(title = "sport", categories = Some(Seq("SPORT"))),
-        aPost().copy(title = "news", categories = Some(Seq("NEWS")))
+        aPost(generateId()).copy(title = "food and tech", categories = Some(Seq("FOOD", "TECH"))),
+        aPost(generateId()).copy(title = "food", categories = Some(Seq("FOOD"))),
+        aPost(generateId()).copy(title = "sport", categories = Some(Seq("SPORT"))),
+        aPost(generateId()).copy(title = "news", categories = Some(Seq("NEWS")))
       )
 
       val response = server.httpGet(path = "/post?q=FOOD", andExpect = Status.Ok).getContentString()
